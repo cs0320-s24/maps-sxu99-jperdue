@@ -12,7 +12,7 @@ export default function MapsGearup() {
 
   return (
     <div>
-      <h1 aria-label="Gearup Title">Maps Gearup</h1>
+      <h1 aria-label="Page Title">Maps</h1>
       <button onClick={() => setSection(Section.FIRESTORE_DEMO)}>
         Section 1: Firestore Demo
       </button>

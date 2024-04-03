@@ -1,8 +1,11 @@
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { getLoginCookie } from "../utils/cookie";
 import Map, {
   Layer,
   MapLayerMouseEvent,
+  Marker,
+  PointLike,
   Source,
   ViewStateChangeEvent,
 } from "react-map-gl";
@@ -18,16 +21,14 @@ export interface LatLong {
   long: number;
 }
 
+// const USER_ID = getLoginCookie() || "";
+
 const ProvidenceLatLong: LatLong = {
   lat: 41.824,
   long: -71.4128,
 };
 const initialZoom = 10;
 
-function onMapClick(e: MapLayerMouseEvent) {
-  console.log(e.lngLat.lat);
-  console.log(e.lngLat.lng);
-}
 
 export default function Mapbox() {
   const [viewState, setViewState] = useState({
@@ -35,6 +36,19 @@ export default function Mapbox() {
     longitude: ProvidenceLatLong.long,
     zoom: initialZoom,
   });
+
+  const [pins, setPins] = useState<LatLong[]>([])
+
+  function onMapClick(e: MapLayerMouseEvent) {
+
+    console.log(e.lngLat.lat);
+    console.log(e.lngLat.lng);
+    const latLng: LatLong = {
+      lat: e.lngLat.lat,
+      long: e.lngLat.lng
+    }
+    setPins([...pins, latLng])
+  }
 
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(
     undefined
@@ -54,6 +68,13 @@ export default function Mapbox() {
         onMove={(ev: ViewStateChangeEvent) => setViewState(ev.viewState)}
         onClick={(ev: MapLayerMouseEvent) => onMapClick(ev)}
       >
+        {pins.map((pin) => (
+          <Marker
+            latitude={pin.lat}
+            longitude={pin.long}
+          >
+          </Marker>
+        ))}
         <Source id="geo_data" type="geojson" data={overlay}>
           <Layer {...geoLayer} />
         </Source>

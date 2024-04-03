@@ -25,6 +25,7 @@ export async function addWord(word: string) {
   });
 }
 
+// add a pin to firebase data
 export async function addPin(loc: LatLong) {
   return await queryAPI("add-pin", {
     uid: getLoginCookie() || "",
@@ -39,6 +40,7 @@ export async function getWords() {
   });
 }
 
+// request all user pins from firebase
 export async function getPins() {
   return await queryAPI("get-pins", {
     uid: getLoginCookie() || "",

@@ -17,12 +17,14 @@ if (!MAPBOX_API_KEY) {
   console.error("Mapbox API key not found. Please add it to your .env file.");
 }
 
+// LatLong object for pins
 export interface LatLong {
   lat: number;
   long: number;
 }
 
 const USER_ID = getLoginCookie() || "";
+
 
 const ProvidenceLatLong: LatLong = {
   lat: 41.824,
@@ -32,14 +34,17 @@ const initialZoom = 10;
 
 
 export default function Mapbox() {
+  // starting view
   const [viewState, setViewState] = useState({
     latitude: ProvidenceLatLong.lat,
     longitude: ProvidenceLatLong.long,
     zoom: initialZoom,
   });
 
+  // variable for account pins
   const [pins, setPins] = useState<LatLong[]>([])
 
+  // load account pins
   useEffect(() => {
     getPins().then((data) => {
       setPins(data.pins.map((str: string) => {
@@ -53,6 +58,7 @@ export default function Mapbox() {
     });
   }, []);
 
+  // on click, add pins to pins variable and load to firebase
   function onMapClick(e: MapLayerMouseEvent) {
 
     console.log(e.lngLat.lat);
@@ -85,14 +91,14 @@ export default function Mapbox() {
         onClick={(ev: MapLayerMouseEvent) => onMapClick(ev)}
       >
         {pins.map((pin) => (
-          <Marker
+          <Marker // add a marker for every pin in the pins variable
             latitude={pin.lat}
             longitude={pin.long}
           >
           </Marker>
         ))}
         <div style={{ position: 'absolute', top: 15, right: 15, zIndex: 1 }}>
-          <button onClick={async () => {
+          <button onClick={async () => { // a button to clear pins, also clear data from firebase
           setPins([]);
           await clearUser();
         }}>Clear Pins</button>

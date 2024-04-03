@@ -50,6 +50,10 @@ export default function Mapbox() {
     setPins([...pins, latLng])
   }
 
+  function clearPins() {
+    setPins([])
+  }
+
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(
     undefined
   );
@@ -75,6 +79,9 @@ export default function Mapbox() {
           >
           </Marker>
         ))}
+        <div style={{ position: 'absolute', top: 15, right: 15, zIndex: 1 }}>
+          <button onClick={clearPins}>Clear Pins</button>
+        </div>
         <Source id="geo_data" type="geojson" data={overlay}>
           <Layer {...geoLayer} />
         </Source>

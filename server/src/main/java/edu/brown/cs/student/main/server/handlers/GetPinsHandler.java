@@ -10,6 +10,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Handler to request all pins from firebase
+ */
 public class GetPinsHandler implements Route {
 
     public StorageInterface storageHandler;

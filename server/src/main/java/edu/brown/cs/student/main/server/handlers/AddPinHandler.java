@@ -7,6 +7,9 @@ import spark.Request;
 import spark.Response;
 import spark.Route;
 
+/**
+ * Handler for adding a pin
+ */
 public class AddPinHandler implements Route {
 
     public StorageInterface storageHandler;
@@ -16,7 +19,7 @@ public class AddPinHandler implements Route {
     }
 
     /**
-     * Invoked when a request is made on this route's corresponding path e.g. '/hello'
+     * Invoked when a request is made on this route's corresponding path e.g. 'lat/long'
      *
      * @param request The request object providing information about the HTTP request
      * @param response The response object providing functionality for modifying the response

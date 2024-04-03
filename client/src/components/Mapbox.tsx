@@ -42,7 +42,14 @@ export default function Mapbox() {
 
   useEffect(() => {
     getPins().then((data) => {
-      setPins(data.pins.map((str: string) => {return str.split("-");}))
+      setPins(data.pins.map((str: string) => {
+        let parts = str.split(":");
+        let pinData: LatLong = {
+          lat: parseFloat(parts[0]),
+          long: parseFloat(parts[1])
+      
+        }; 
+        return pinData}))
     });
   }, []);
 

@@ -45,7 +45,7 @@ public class AddPinHandler implements Route {
             this.storageHandler.addDocument(uid, "pins", wordId, data);
 
             responseMap.put("response_type", "success");
-            responseMap.put("pin", lat + "-" + lng);
+            responseMap.put("pin", lat + ":" + lng);
         } catch (Exception e) {
             // error likely occurred in the storage handler
             e.printStackTrace();

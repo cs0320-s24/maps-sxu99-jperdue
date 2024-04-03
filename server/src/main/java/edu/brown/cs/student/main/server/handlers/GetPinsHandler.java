@@ -39,8 +39,9 @@ public class GetPinsHandler implements Route {
             System.out.println(vals);
 
             // convert the key,value map to just a list of the words.
-            List<String> pins = vals.stream().map(pin -> pin.get("lat").toString() + "-" + pin.get("long").toString()).toList();
+            List<String> pins = vals.stream().map(pin -> pin.get("lat").toString() + ":" + pin.get("long").toString()).toList();
 
+            System.out.println(pins);
             responseMap.put("response_type", "success");
             responseMap.put("pins", pins);
         } catch (Exception e) {

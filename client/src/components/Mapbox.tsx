@@ -22,7 +22,7 @@ export interface LatLong {
   long: number;
 }
 
-// const USER_ID = getLoginCookie() || "";
+const USER_ID = getLoginCookie() || "";
 
 const ProvidenceLatLong: LatLong = {
   lat: 41.824,
@@ -75,6 +75,7 @@ export default function Mapbox() {
 
   return (
     <div className="map">
+      <h2 className="map-title">Map For User: {USER_ID}</h2>
       <Map
         mapboxAccessToken={MAPBOX_API_KEY}
         {...viewState}

@@ -35,7 +35,7 @@ public class AddPinHandler implements Route {
             data.put("lat", lat);
             data.put("long", lng);
 
-            System.out.println("adding pin: " + lat + "-" + lng + " for user: " + uid);
+            System.out.println("adding pin: " + lat + ":" + lng + " for user: " + uid);
 
             // get the current word count to make a unique word_id by index.
             int pinCount = this.storageHandler.getCollection(uid, "pins").size();

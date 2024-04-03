@@ -10,6 +10,7 @@ import Map, {
   ViewStateChangeEvent,
 } from "react-map-gl";
 import { geoLayer, overlayData } from "../utils/overlay";
+import { addPin } from "../utils/api";
 
 const MAPBOX_API_KEY = process.env.MAPBOX_TOKEN;
 if (!MAPBOX_API_KEY) {
@@ -39,6 +40,12 @@ export default function Mapbox() {
 
   const [pins, setPins] = useState<LatLong[]>([])
 
+  // useEffect(() => {
+  //   getPins().then((data) => {
+  //     setPins(data.words);
+  //   });
+  // }, []);
+
   function onMapClick(e: MapLayerMouseEvent) {
 
     console.log(e.lngLat.lat);
@@ -48,6 +55,7 @@ export default function Mapbox() {
       long: e.lngLat.lng
     }
     setPins([...pins, latLng])
+    addPin(latLng)
   }
 
   function clearPins() {

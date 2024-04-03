@@ -1,3 +1,4 @@
+import { LatLong } from "../components/Mapbox";
 import { getLoginCookie } from "./cookie";
 
 const HOST = "http://localhost:3232";
@@ -21,6 +22,14 @@ export async function addWord(word: string) {
   return await queryAPI("add-word", {
     uid: getLoginCookie() || "",
     word: word,
+  });
+}
+
+export async function addPin(loc: LatLong) {
+  return await queryAPI("add-pin", {
+    uid: getLoginCookie() || "",
+    lat: loc.lat.toString(),
+    long: loc.long.toString()
   });
 }
 

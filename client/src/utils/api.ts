@@ -39,6 +39,12 @@ export async function getWords() {
   });
 }
 
+export async function getPins() {
+  return await queryAPI("get-pins", {
+    uid: getLoginCookie() || "",
+  });
+}
+
 export async function clearUser(uid: string = getLoginCookie() || "") {
   return await queryAPI("clear-user", {
     uid: uid,

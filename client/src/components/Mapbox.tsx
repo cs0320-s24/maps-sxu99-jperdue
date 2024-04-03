@@ -10,7 +10,7 @@ import Map, {
   ViewStateChangeEvent,
 } from "react-map-gl";
 import { geoLayer, overlayData } from "../utils/overlay";
-import { addPin } from "../utils/api";
+import { addPin, getPins, clearUser } from "../utils/api";
 
 const MAPBOX_API_KEY = process.env.MAPBOX_TOKEN;
 if (!MAPBOX_API_KEY) {
@@ -40,11 +40,11 @@ export default function Mapbox() {
 
   const [pins, setPins] = useState<LatLong[]>([])
 
-  // useEffect(() => {
-  //   getPins().then((data) => {
-  //     setPins(data.words);
-  //   });
-  // }, []);
+  useEffect(() => {
+    getPins().then((data) => {
+      setPins(data.pins.map((str: string) => {return str.split("-");}))
+    });
+  }, []);
 
   function onMapClick(e: MapLayerMouseEvent) {
 
@@ -56,10 +56,6 @@ export default function Mapbox() {
     }
     setPins([...pins, latLng])
     addPin(latLng)
-  }
-
-  function clearPins() {
-    setPins([])
   }
 
   const [overlay, setOverlay] = useState<GeoJSON.FeatureCollection | undefined>(
@@ -88,7 +84,10 @@ export default function Mapbox() {
           </Marker>
         ))}
         <div style={{ position: 'absolute', top: 15, right: 15, zIndex: 1 }}>
-          <button onClick={clearPins}>Clear Pins</button>
+          <button onClick={async () => {
+          setPins([]);
+          await clearUser();
+        }}>Clear Pins</button>
         </div>
         <Source id="geo_data" type="geojson" data={overlay}>
           <Layer {...geoLayer} />

@@ -2,10 +2,7 @@ package edu.brown.cs.student.main.server;
 
 import static spark.Spark.after;
 
-import edu.brown.cs.student.main.server.handlers.AddWordHandler;
-import edu.brown.cs.student.main.server.handlers.AddPinHandler;
-import edu.brown.cs.student.main.server.handlers.ClearUserHandler;
-import edu.brown.cs.student.main.server.handlers.ListWordsHandler;
+import edu.brown.cs.student.main.server.handlers.*;
 import edu.brown.cs.student.main.server.storage.FirebaseUtilities;
 import edu.brown.cs.student.main.server.storage.StorageInterface;
 import java.io.IOException;
@@ -34,6 +31,7 @@ public class Server {
       Spark.get("list-words", new ListWordsHandler(firebaseUtils));
       Spark.get("clear-user", new ClearUserHandler(firebaseUtils));
       Spark.get("add-pin", new AddPinHandler(firebaseUtils));
+      Spark.get("get-pins", new GetPinsHandler(firebaseUtils));
 
       Spark.notFound(
           (request, response) -> {

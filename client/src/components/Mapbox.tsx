@@ -78,7 +78,7 @@ export default function Mapbox() {
   // state variable for the query
   const [query, setQuery] = useState<string>("")
 
-  // search method - clear query after entering
+  // search method - clear query after
   function handleSearch() {
     console.log(query)
     setQuery("")

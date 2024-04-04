@@ -26,9 +26,9 @@ export interface LatLong {
 const USER_ID = getLoginCookie() || "";
 
 
-const ProvidenceLatLong: LatLong = {
-  lat: 41.824,
-  long: -71.4128,
+const InitLatLong: LatLong = {
+  lat: 29.75010476836566,
+  long: -95.36528489110573,
 };
 const initialZoom = 10;
 
@@ -36,8 +36,8 @@ const initialZoom = 10;
 export default function Mapbox() {
   // starting view
   const [viewState, setViewState] = useState({
-    latitude: ProvidenceLatLong.lat,
-    longitude: ProvidenceLatLong.long,
+    latitude: InitLatLong.lat,
+    longitude: InitLatLong.long,
     zoom: initialZoom,
   });
 
@@ -109,6 +109,7 @@ export default function Mapbox() {
           placeholder="Enter an Area to Search for"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          style={{ width: '400px' }} 
         />
         <button onClick={handleSearch}>Search</button>
       </div>

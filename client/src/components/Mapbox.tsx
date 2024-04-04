@@ -79,7 +79,22 @@ export default function Mapbox() {
 
   function handleSearch() {
     console.log(query)
+    setQuery("")
   }
+
+  useEffect(() => {
+    function handleKeyPress(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+          handleSearch();
+          console.log("enter pressed")
+        }
+      }
+      document.addEventListener("keypress", handleKeyPress);
+
+      return () => {
+        document.removeEventListener("keypress", handleKeyPress);
+      }
+    }, [query, handleSearch]);
 
   useEffect(() => {
     setOverlay(overlayData());

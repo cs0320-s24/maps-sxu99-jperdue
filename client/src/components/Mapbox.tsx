@@ -75,13 +75,16 @@ export default function Mapbox() {
     undefined
   );
 
+  // state variable for the query
   const [query, setQuery] = useState<string>("")
 
+  // search method - clear query after entering
   function handleSearch() {
     console.log(query)
     setQuery("")
   }
 
+  // use effect to search by pressing enter
   useEffect(() => {
     function handleKeyPress(event: KeyboardEvent) {
         if (event.key === "Enter") {

@@ -44,10 +44,10 @@ public class FirebaseUtilities implements StorageInterface {
 
   @Override
   public void addDocument(String uid, String collection_id, String doc_id, Map<String, Object> data)
-          throws IllegalArgumentException {
+      throws IllegalArgumentException {
     if (uid == null || collection_id == null || doc_id == null || data == null) {
       throw new IllegalArgumentException(
-              "addDocument: uid, collection_id, doc_id, or data cannot be null");
+          "addDocument: uid, collection_id, doc_id, or data cannot be null");
     }
     // adds a new document 'doc_name' to colleciton 'collection_id' for user 'uid'
     // with data payload 'data'.
@@ -59,7 +59,7 @@ public class FirebaseUtilities implements StorageInterface {
     Firestore db = FirestoreClient.getFirestore();
     // 1: Get a ref to the collection that you created
     CollectionReference collectionRef =
-            db.collection("users").document(uid).collection(collection_id);
+        db.collection("users").document(uid).collection(collection_id);
 
     // 2: Write data to the collection ref
     collectionRef.document(doc_id).set(data);

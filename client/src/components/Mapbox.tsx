@@ -75,6 +75,12 @@ export default function Mapbox() {
     undefined
   );
 
+  const [query, setQuery] = useState<string>("")
+
+  function handleSearch() {
+    console.log(query)
+  }
+
   useEffect(() => {
     setOverlay(overlayData());
   }, []);
@@ -82,6 +88,15 @@ export default function Mapbox() {
   return (
     <div className="map">
       <h2 className="map-title">Map For User: {USER_ID}</h2>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Enter an Area to Search for"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
       <Map
         mapboxAccessToken={MAPBOX_API_KEY}
         {...viewState}

@@ -26,9 +26,9 @@ export interface LatLong {
 const USER_ID = getLoginCookie() || "";
 
 
-const ProvidenceLatLong: LatLong = {
-  lat: 41.824,
-  long: -71.4128,
+const InitLatLong: LatLong = {
+  lat: 29.75010476836566,
+  long: -95.36528489110573,
 };
 const initialZoom = 10;
 
@@ -36,8 +36,8 @@ const initialZoom = 10;
 export default function Mapbox() {
   // starting view
   const [viewState, setViewState] = useState({
-    latitude: ProvidenceLatLong.lat,
-    longitude: ProvidenceLatLong.long,
+    latitude: InitLatLong.lat,
+    longitude: InitLatLong.long,
     zoom: initialZoom,
   });
 
@@ -75,6 +75,30 @@ export default function Mapbox() {
     undefined
   );
 
+  // state variable for the query
+  const [query, setQuery] = useState<string>("")
+
+  // search method - clear query after
+  function handleSearch() {
+    console.log(query)
+    setQuery("")
+  }
+
+  // use effect to search by pressing enter
+  useEffect(() => {
+    function handleKeyPress(event: KeyboardEvent) {
+        if (event.key === "Enter") {
+          handleSearch();
+          console.log("enter pressed")
+        }
+      }
+      document.addEventListener("keypress", handleKeyPress);
+
+      return () => {
+        document.removeEventListener("keypress", handleKeyPress);
+      }
+    }, [query, handleSearch]);
+
   useEffect(() => {
     setOverlay(overlayData());
   }, []);
@@ -82,6 +106,16 @@ export default function Mapbox() {
   return (
     <div className="map">
       <h2 className="map-title">Map For User: {USER_ID}</h2>
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Enter an Area to Search for"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          style={{ width: '400px' }} 
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
       <Map
         mapboxAccessToken={MAPBOX_API_KEY}
         {...viewState}

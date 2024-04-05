@@ -22,6 +22,7 @@ public class GeoHandler implements Route {
 
   /**
    * Handle GeoJson request
+   *
    * @param request url with params
    * @param response response object
    * @return Object
@@ -29,15 +30,15 @@ public class GeoHandler implements Route {
   @Override
   public Object handle(Request request, Response response) {
     try { // Handle when keyword is provided from search in the backend
-      if (request.queryParams("keyword") != null){
+      if (request.queryParams("keyword") != null) {
         String keyword = request.queryParams("keyword");
         this.loadGeoJsonData();
         List<GeoJsonData.Feature> features = this.geoJsonData.features;
         // Filter regions
         List<GeoJsonData.Feature> filteredRegions =
-                features.stream()
-                        .filter(feature -> this.hasKeyword(feature, keyword))
-                        .collect(Collectors.toList());
+            features.stream()
+                .filter(feature -> this.hasKeyword(feature, keyword))
+                .collect(Collectors.toList());
 
         GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
 
@@ -60,9 +61,9 @@ public class GeoHandler implements Route {
 
           // Filter regions
           List<GeoJsonData.Feature> filteredRegions =
-                  features.stream()
-                          .filter(feature -> isContainedIn(feature, minLat, maxLat, minLong, maxLong))
-                          .collect(Collectors.toList());
+              features.stream()
+                  .filter(feature -> isContainedIn(feature, minLat, maxLat, minLong, maxLong))
+                  .collect(Collectors.toList());
 
           GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
 
@@ -162,6 +163,7 @@ public class GeoHandler implements Route {
 
   /**
    * Function to check if a feature has desired keyword
+   *
    * @param feature feature being observed
    * @param keyword word to search for
    * @return true if contains word
@@ -170,9 +172,9 @@ public class GeoHandler implements Route {
 
     Collection<String> area_description_data = feature.properties.area_description_data.values();
 
-    for (String word : area_description_data){
+    for (String word : area_description_data) {
       String[] split = word.split(" ");
-      if (Arrays.stream(split).toList().contains(keyword)){
+      if (Arrays.stream(split).toList().contains(keyword)) {
         return true;
       }
     }

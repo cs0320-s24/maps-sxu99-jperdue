@@ -25,7 +25,8 @@ public class GeoHandler implements Route {
     this.filepath = filepath;
   }
 
-  private final String filepath;
+  public final String filepath;
+  public GeoJsonData geoJsonData;
 
   public record GeoJsonData(String type, List<Region> regions) {}
   public record Region(String type, Coords coords, Props props) {}
@@ -44,8 +45,8 @@ public class GeoHandler implements Route {
 
       // Load GeoJSON data
       try {
-        GeoJsonData data = loadGeoJsonData();
-        List<Region> regions = data.regions;
+        this.loadGeoJsonData();
+        List<Region> regions = this.geoJsonData.regions;
 
         // Filter regions
         List<Region> filteredRegions =
@@ -53,47 +54,72 @@ public class GeoHandler implements Route {
                         .filter(region -> isContainedIn(region, minLat, maxLat, minLong, maxLong))
                         .collect(Collectors.toList());
 
-        GeoJsonData output = new GeoJsonData(data.type, filteredRegions);
+        GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
+
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put("data", output);
+
+
 
         // Return GeoJSON data
-        return new GeoJsonSuccessResponse(output).serialize();
+        return Utils.toMoshiJson(responseMap);
+       // return new GeoJsonSuccessResponse(output).serialize();
       } catch (IOException e) {
         return new GeoJsonFailureResponse(e.getMessage()).serialize();
       }
 
     } catch (Exception e) {
       try {
-        GeoJsonData data = loadGeoJsonData();
+        loadGeoJsonData();
         // Convert back to GeoJSON
         // Return GeoJSON data
-        return new GeoJsonSuccessResponse(data).serialize();
+        Map<String, Object> responseMap = new HashMap<String, Object>();
+        responseMap.put("data", this.geoJsonData);
+        return Utils.toMoshiJson(responseMap);
+
       } catch (IOException e2){
-        return new GeoJsonFailureResponse(e.getMessage()).serialize();
+        return new GeoJsonFailureResponse(e2.getMessage()).serialize();
       }
     }
   }
 
-  private GeoJsonData loadGeoJsonData() throws IOException {
+  /**
+   * Parses JSON data from a JsonReader and converts it to the specified target type.
+   *
+   * @param source The JsonReader containing the JSON data.
+   * @param targetType The Class representing the target data type to convert the JSON to.
+   * @param <T> The generic type of the target data.
+   * @return An instance of the target data type parsed from the JSON.
+   * @throws IOException if there's an error reading or parsing the JSON data.
+   */
+  public static <T> T fromJsonGeneral(String source, Class<T> targetType) throws IOException {
+    Moshi moshi = new Moshi.Builder().build();
+    JsonAdapter<T> adapter = moshi.adapter(targetType);
+    //    source.setLenient(true);
+
+    return adapter.fromJson(source);
+  }
+
+  /**
+   * Load Json data
+   * @return GeoJsonData
+   */
+  public void loadGeoJsonData() throws IOException {
     try {
-      // Load the GeoJSON data from a file
-      FileReader reader = new FileReader(this.filepath);
-      BufferedReader bufferedReader = new BufferedReader(reader);
-      String geoJsonString = "";
-      String line = bufferedReader.readLine();
+      FileReader jsonReader = new FileReader(this.filepath);
+      BufferedReader br = new BufferedReader(jsonReader);
+      String fileString = "";
+      String line = br.readLine();
       while (line != null) {
-        geoJsonString = geoJsonString + line;
-        line = bufferedReader.readLine();
+        fileString = fileString + line;
+        line = br.readLine();
       }
-      reader.close();
+      jsonReader.close();
 
-      // Parse it into a list of Region objects using Moshi
-      Moshi moshi = new Moshi.Builder().build();
-      JsonAdapter<GeoJsonData> jsonAdapter =
-              moshi.adapter(Types.newParameterizedType(GeoJsonData.class));
+      this.geoJsonData = fromJsonGeneral(fileString, GeoJsonData.class);
 
-      return jsonAdapter.fromJson(geoJsonString);
     } catch (IOException e) {
-      e.printStackTrace();
+      System.out.println(e.getMessage());
       throw e;
     }
   }
@@ -126,40 +152,6 @@ public class GeoHandler implements Route {
             regMaxLng <= maxLng);
   }
 
-//  private String convertToGeoJson(List<Region> regions) {
-//    // Convert the list of Region objects back into GeoJSON using Moshi
-//    Moshi moshi = new Moshi.Builder().build();
-//    JsonAdapter<List<Region>> jsonAdapter =
-//        moshi.adapter(Types.newParameterizedType(List.class, Region.class));
-//
-//    return jsonAdapter.toJson(regions);
-//  }
-
-  private record GeoJsonSuccessResponse(String type, GeoJsonData data) {
-    public GeoJsonSuccessResponse(GeoJsonData data) {
-      this("success", data);
-    }
-
-    String serialize() {
-
-      Map<String, Object> response = new HashMap();
-      response.put("result", this.type);
-      response.put("data", this.data);
-
-      Type mapOfStringObjectType = Types.newParameterizedType(Map.class, String.class, Object.class);
-
-      try {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(mapOfStringObjectType);
-        String json = adapter.toJson(response);
-        return json;
-      } catch(Exception e) {
-        e.printStackTrace();
-        throw e;
-      }
-    }
-  }
-
   private record GeoJsonFailureResponse(String type, String error) {
     public GeoJsonFailureResponse(String error) {
       this("failure", error);
@@ -169,15 +161,14 @@ public class GeoHandler implements Route {
 
       Map<String, Object> response = new HashMap();
       response.put("result", this.type);
-      response.put("filtered features", this.error);
-
-      Type mapOfStringObjectType = Types.newParameterizedType(Map.class, String.class, Object.class);
+      response.put("message", this.error);
 
       try {
-        Moshi moshi = new Moshi.Builder().build();
-        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(mapOfStringObjectType);
-        String json = adapter.toJson(response);
-        return json;
+        return Utils.toMoshiJson(response);
+//        Moshi moshi = new Moshi.Builder().build();
+//        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(mapOfStringObjectType);
+//        String json = adapter.toJson(response);
+//        return json;
       } catch(Exception e) {
         e.printStackTrace();
         throw e;

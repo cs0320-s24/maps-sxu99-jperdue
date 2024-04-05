@@ -2,15 +2,9 @@ package edu.brown.cs.student.main.server.handlers;
 
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Type;
-import java.nio.Buffer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,19 +15,12 @@ import spark.Route;
 
 public class GeoHandler implements Route {
 
-  public GeoHandler(String filepath){
+  public GeoHandler(String filepath) {
     this.filepath = filepath;
   }
 
   public final String filepath;
   public GeoJsonData geoJsonData;
-
-  public record GeoJsonData(String type, List<Region> regions) {}
-  public record Region(String type, Coords coords, Props props) {}
-
-  public record Coords(String type, List<List<List<List<Double>>>> coordinates) {}
-  public record Props (String state, String city, String name, String holc_grade, Map<String,
-          String> area_description_data) {}
 
   @Override
   public Object handle(Request request, Response response) {
@@ -46,24 +33,22 @@ public class GeoHandler implements Route {
       // Load GeoJSON data
       try {
         this.loadGeoJsonData();
-        List<Region> regions = this.geoJsonData.regions;
+        List<GeoJsonData.Feature> features = this.geoJsonData.features;
 
         // Filter regions
-        List<Region> filteredRegions =
-                regions.stream()
-                        .filter(region -> isContainedIn(region, minLat, maxLat, minLong, maxLong))
-                        .collect(Collectors.toList());
+        List<GeoJsonData.Feature> filteredRegions =
+            features.stream()
+                .filter(feature -> isContainedIn(feature, minLat, maxLat, minLong, maxLong))
+                .collect(Collectors.toList());
 
         GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
 
         Map<String, Object> responseMap = new HashMap<String, Object>();
         responseMap.put("data", output);
 
-
-
         // Return GeoJSON data
         return Utils.toMoshiJson(responseMap);
-       // return new GeoJsonSuccessResponse(output).serialize();
+        // return new GeoJsonSuccessResponse(output).serialize();
       } catch (IOException e) {
         return new GeoJsonFailureResponse(e.getMessage()).serialize();
       }
@@ -77,7 +62,7 @@ public class GeoHandler implements Route {
         responseMap.put("data", this.geoJsonData);
         return Utils.toMoshiJson(responseMap);
 
-      } catch (IOException e2){
+      } catch (Exception e2) {
         return new GeoJsonFailureResponse(e2.getMessage()).serialize();
       }
     }
@@ -102,6 +87,7 @@ public class GeoHandler implements Route {
 
   /**
    * Load Json data
+   *
    * @return GeoJsonData
    */
   public void loadGeoJsonData() throws IOException {
@@ -125,7 +111,7 @@ public class GeoHandler implements Route {
   }
 
   private boolean isContainedIn(
-      Region region, double minLat, double maxLat, double minLng, double maxLng) {
+      GeoJsonData.Feature feature, double minLat, double maxLat, double minLng, double maxLng) {
     // Get the boundary of the region
 
     Double regMinLat = 90.0;
@@ -133,10 +119,10 @@ public class GeoHandler implements Route {
     Double regMinLng = 180.0;
     Double regMaxLng = -180.0;
 
-    List<List<List<List<Double>>>> coords = region.coords().coordinates;
-    for (List<List<List<Double>>> poly : coords){
-      for (List<List<Double>> ring : poly){
-        for (List<Double> coordinate : ring){
+    List<List<List<List<Double>>>> coords = feature.geometry.coordinates;
+    for (List<List<List<Double>>> poly : coords) {
+      for (List<List<Double>> ring : poly) {
+        for (List<Double> coordinate : ring) {
           regMinLat = Double.min(regMinLat, coordinate.get(1));
           regMaxLat = Double.max(regMaxLat, coordinate.get(1));
           regMinLng = Double.min(regMinLng, coordinate.get(0));
@@ -145,11 +131,10 @@ public class GeoHandler implements Route {
       }
     }
 
-    return (
-            regMinLat >= minLat &&
-            regMaxLat <= maxLat &&
-            regMinLng >= minLng &&
-            regMaxLng <= maxLng);
+    return (regMinLat >= minLat
+        && regMaxLat <= maxLat
+        && regMinLng >= minLng
+        && regMaxLng <= maxLng);
   }
 
   private record GeoJsonFailureResponse(String type, String error) {
@@ -165,16 +150,10 @@ public class GeoHandler implements Route {
 
       try {
         return Utils.toMoshiJson(response);
-//        Moshi moshi = new Moshi.Builder().build();
-//        JsonAdapter<Map<String, Object>> adapter = moshi.adapter(mapOfStringObjectType);
-//        String json = adapter.toJson(response);
-//        return json;
-      } catch(Exception e) {
+      } catch (Exception e) {
         e.printStackTrace();
         throw e;
       }
     }
   }
-
-
 }

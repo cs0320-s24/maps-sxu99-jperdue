@@ -17,6 +17,12 @@ import spark.Route;
 
 public class GeoHandler implements Route {
 
+  public record Region(String type, Coords coords, Props props) {}
+
+  public record Coords(String type, List<List<List<List<Double>>>> coordinates) {}
+  public record Props (String state, String city, String name, String holc_grade, Map<String,
+          String> area_description_data) {}
+
   @Override
   public Object handle(Request request, Response response) {
     try {
@@ -52,10 +58,9 @@ public class GeoHandler implements Route {
       String geoJson = new String(Files.readAllBytes(Paths.get(filepath)));
 
       // Parse it into a list of Region objects using Moshi
-
       Moshi moshi = new Moshi.Builder().build();
       JsonAdapter<List<Region>> jsonAdapter =
-          moshi.adapter(Types.newParameterizedType(List.class, Region.class));
+              moshi.adapter(Types.newParameterizedType(List.class, Region.class));
 
       return jsonAdapter.fromJson(geoJson);
     } catch (IOException e) {
@@ -67,13 +72,11 @@ public class GeoHandler implements Route {
   private boolean isContainedIn(
       Region region, double minLat, double maxLat, double minLong, double maxLong) {
     // Get the boundary of the region
-    Boundary boundary = region.getBoundary();
 
-    // Check if the region's boundaries are within the specified boundaries
-    return boundary.getMinLat() >= minLat
-        && boundary.getMaxLat() <= maxLat
-        && boundary.getMinLong() >= minLong
-        && boundary.getMaxLong() <= maxLong;
+//    List<List<List<List<Double>>>> coords =
+    return true;
+
+
   }
 
 //  private String convertToGeoJson(List<Region> regions) {

@@ -27,11 +27,15 @@ public class Server {
     try {
       firebaseUtils = new FirebaseUtilities();
 
+      String filepath =
+          "C:\\Users\\johnp\\OneDrive\\Desktop\\320\\maps-sxu99-jperdue\\server\\src\\main\\java\\edu\\brown\\cs\\student\\main\\server\\data\\fullDownload.json";
+
       Spark.get("add-word", new AddWordHandler(firebaseUtils));
       Spark.get("list-words", new ListWordsHandler(firebaseUtils));
       Spark.get("clear-user", new ClearUserHandler(firebaseUtils));
       Spark.get("add-pin", new AddPinHandler(firebaseUtils));
       Spark.get("get-pins", new GetPinsHandler(firebaseUtils));
+      Spark.get("data-request", new GeoHandler(filepath));
 
       Spark.notFound(
           (request, response) -> {

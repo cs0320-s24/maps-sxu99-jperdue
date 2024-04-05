@@ -70,12 +70,33 @@ public class GeoHandler implements Route {
   }
 
   private boolean isContainedIn(
-      Region region, double minLat, double maxLat, double minLong, double maxLong) {
+      Region region, double minLat, double maxLat, double minLng, double maxLng) {
     // Get the boundary of the region
 
-    List<List<List<List<Double>>>> coords = region.coords().coordinates;
-    return true;
+    Double regMinLat = 90.0;
+    Double regMaxLat = -90.0;
+    Double regMinLng = 180.0;
+    Double regMaxLng = -180.0;
 
+    List<List<List<List<Double>>>> coords = region.coords().coordinates;
+    for (List<List<List<Double>>> poly : coords){
+      for (List<List<Double>> ring : poly){
+        for (List<Double> coordinate : ring){
+          regMinLat = Double.min(regMinLat, coordinate.get(1));
+          regMaxLat = Double.max(regMaxLat, coordinate.get(1));
+          regMinLng = Double.min(regMinLng, coordinate.get(0));
+          regMaxLng = Double.max(regMaxLng, coordinate.get(0));
+        }
+      }
+    }
+
+    CoordsBox regBox = new CoordsBox(regMinLat, regMaxLat, regMinLng, regMaxLng);
+
+    return (regBox != null &&
+            regMinLat >= minLat &&
+            regMaxLat <= maxLat &&
+            regMinLng >= minLng &&
+            regMaxLng <= maxLng);
 
   }
 

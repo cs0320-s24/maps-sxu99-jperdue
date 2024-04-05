@@ -47,6 +47,13 @@ export async function getPins() {
   });
 }
 
+// request all all Geo Data from api
+export async function getGeoData() {
+  return await queryAPI("data-request", {
+    uid: getLoginCookie() || "",
+  });
+}
+
 export async function clearUser(uid: string = getLoginCookie() || "") {
   return await queryAPI("clear-user", {
     uid: uid,

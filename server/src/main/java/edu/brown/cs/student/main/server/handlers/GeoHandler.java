@@ -90,14 +90,11 @@ public class GeoHandler implements Route {
       }
     }
 
-    CoordsBox regBox = new CoordsBox(regMinLat, regMaxLat, regMinLng, regMaxLng);
-
-    return (regBox != null &&
+    return (
             regMinLat >= minLat &&
             regMaxLat <= maxLat &&
             regMinLng >= minLng &&
             regMaxLng <= maxLng);
-
   }
 
 //  private String convertToGeoJson(List<Region> regions) {
@@ -118,7 +115,7 @@ public class GeoHandler implements Route {
 
       Map<String, Object> response = new HashMap();
       response.put("result", this.type);
-      response.put("filtered features", this.filteredRegions);
+      response.put("data", this.filteredRegions);
 
       Type mapOfStringObjectType = Types.newParameterizedType(Map.class, String.class, Object.class);
 

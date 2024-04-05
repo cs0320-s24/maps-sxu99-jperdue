@@ -3,6 +3,18 @@ import { FillLayer } from "react-map-gl";
 
 import rl_data from "../geodata/fullDownload.json";
 
+const loadData = async () => {
+  const loadResp: Promise<String> = await fetch("http://localhost:3232/data-request")
+    .then((response) => response.json())
+    .catch(console.error);
+
+  if (loadResp != undefined) {
+    console.log(loadResp)
+    return loadResp;
+    }
+};
+
+
 const propertyName = "grade";
 export const geoLayer: FillLayer = {
   id: "geo_data",
@@ -30,5 +42,6 @@ function isFeatureCollection(json: any): json is FeatureCollection {
 }
 
 export function overlayData(): GeoJSON.FeatureCollection | undefined {
+  const rl_data = loadData()
   return isFeatureCollection(rl_data) ? rl_data : undefined;
 }

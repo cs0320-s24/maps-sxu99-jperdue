@@ -32,6 +32,7 @@ public class Server {
       Spark.get("clear-user", new ClearUserHandler(firebaseUtils));
       Spark.get("add-pin", new AddPinHandler(firebaseUtils));
       Spark.get("get-pins", new GetPinsHandler(firebaseUtils));
+      Spark.get("data-request", new GeoHandler());
 
       Spark.notFound(
           (request, response) -> {

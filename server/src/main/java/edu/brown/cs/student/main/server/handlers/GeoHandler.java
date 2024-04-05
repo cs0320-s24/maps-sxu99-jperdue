@@ -5,9 +5,7 @@ import com.squareup.moshi.Moshi;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import spark.Request;
 import spark.Response;
@@ -22,24 +20,24 @@ public class GeoHandler implements Route {
   public final String filepath;
   public GeoJsonData geoJsonData;
 
+  /**
+   * Handle GeoJson request
+   * @param request url with params
+   * @param response response object
+   * @return Object
+   */
   @Override
   public Object handle(Request request, Response response) {
-    try {
-      double minLat = Double.parseDouble(request.queryParams("minLat"));
-      double maxLat = Double.parseDouble(request.queryParams("maxLat"));
-      double minLong = Double.parseDouble(request.queryParams("minLong"));
-      double maxLong = Double.parseDouble(request.queryParams("maxLong"));
-
-      // Load GeoJSON data
-      try {
+    try { // Handle when keyword is provided from search in the backend
+      if (request.queryParams("keyword") != null){
+        String keyword = request.queryParams("keyword");
         this.loadGeoJsonData();
         List<GeoJsonData.Feature> features = this.geoJsonData.features;
-
         // Filter regions
         List<GeoJsonData.Feature> filteredRegions =
-            features.stream()
-                .filter(feature -> isContainedIn(feature, minLat, maxLat, minLong, maxLong))
-                .collect(Collectors.toList());
+                features.stream()
+                        .filter(feature -> this.hasKeyword(feature, keyword))
+                        .collect(Collectors.toList());
 
         GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
 
@@ -48,11 +46,36 @@ public class GeoHandler implements Route {
 
         // Return GeoJSON data
         return Utils.toMoshiJson(responseMap);
-        // return new GeoJsonSuccessResponse(output).serialize();
-      } catch (IOException e) {
-        return new GeoJsonFailureResponse(e.getMessage()).serialize();
-      }
+      } else {
 
+        double minLat = Double.parseDouble(request.queryParams("minLat"));
+        double maxLat = Double.parseDouble(request.queryParams("maxLat"));
+        double minLong = Double.parseDouble(request.queryParams("minLong"));
+        double maxLong = Double.parseDouble(request.queryParams("maxLong"));
+
+        // Load GeoJSON data
+        try {
+          this.loadGeoJsonData();
+          List<GeoJsonData.Feature> features = this.geoJsonData.features;
+
+          // Filter regions
+          List<GeoJsonData.Feature> filteredRegions =
+                  features.stream()
+                          .filter(feature -> isContainedIn(feature, minLat, maxLat, minLong, maxLong))
+                          .collect(Collectors.toList());
+
+          GeoJsonData output = new GeoJsonData(this.geoJsonData.type, filteredRegions);
+
+          Map<String, Object> responseMap = new HashMap<String, Object>();
+          responseMap.put("data", output);
+
+          // Return GeoJSON data
+          return Utils.toMoshiJson(responseMap);
+          // return new GeoJsonSuccessResponse(output).serialize();
+        } catch (IOException e) {
+          return new GeoJsonFailureResponse(e.getMessage()).serialize();
+        }
+      }
     } catch (Exception e) {
       try {
         loadGeoJsonData();
@@ -135,6 +158,25 @@ public class GeoHandler implements Route {
         && regMaxLat <= maxLat
         && regMinLng >= minLng
         && regMaxLng <= maxLng);
+  }
+
+  /**
+   * Function to check if a feature has desired keyword
+   * @param feature feature being observed
+   * @param keyword word to search for
+   * @return true if contains word
+   */
+  private boolean hasKeyword(GeoJsonData.Feature feature, String keyword) {
+
+    Collection<String> area_description_data = feature.properties.area_description_data.values();
+
+    for (String word : area_description_data){
+      String[] split = word.split(" ");
+      if (Arrays.stream(split).toList().contains(keyword)){
+        return true;
+      }
+    }
+    return false;
   }
 
   private record GeoJsonFailureResponse(String type, String error) {

@@ -80,6 +80,12 @@ export default function Mapbox() {
 
   // search method - clear query after
   function handleSearch() {
+
+    overlayData(query).then((response : GeoJSON.FeatureCollection | undefined) => {
+      setOverlay(response)
+      console.log(response)
+    })
+    
     console.log(query)
     setQuery("")
   }
@@ -112,12 +118,12 @@ export default function Mapbox() {
       <div className="search-container">
         <input
           type="text"
-          placeholder="Enter an Area to Search for"
+          placeholder="Enter a Keyword"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           style={{ width: '400px' }} 
         />
-        <button onClick={handleSearch}>Search</button>
+        <button onClick={handleSearch}>Enter</button>
       </div>
       <Map
         mapboxAccessToken={MAPBOX_API_KEY}

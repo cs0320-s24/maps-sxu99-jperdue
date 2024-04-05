@@ -108,3 +108,27 @@ test("Clear Pins button is functional", async ({ page }) => {
       response.url().includes("clearUser") && response.status() === 200
   );
 });
+
+test("I can add a pin to the map", async ({ page }) => {
+  await page.goto("http://localhost:8000/");
+
+  // Assume that the map has a label "map"
+  const map = await page.getByLabel("map");
+
+  // Simulate a click on the map
+  await map.click();
+
+  // Wait for the pin to be added
+  await page.waitForSelector(".pin");
+
+  // Check if the pin is visible
+  const pin = await page.$(".pin");
+  expect(await pin?.isVisible()).toBe(true);
+
+  // Reload the page
+  await page.reload();
+
+  // Check if the pin is still there after reload
+  const pinAfterReload = await page.$(".pin");
+  expect(await pinAfterReload?.isVisible()).toBe(true);
+});

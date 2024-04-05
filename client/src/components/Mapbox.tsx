@@ -100,8 +100,11 @@ export default function Mapbox() {
     }, [query, handleSearch]);
 
   useEffect(() => {
-    setOverlay(overlayData());
-  }, []);
+    overlayData("").then((response : GeoJSON.FeatureCollection | undefined) => {
+      setOverlay(response)
+      console.log(response)
+    }
+  )}, []);
 
   return (
     <div className="map">

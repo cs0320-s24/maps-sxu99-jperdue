@@ -48,9 +48,9 @@ export async function getPins() {
 }
 
 // request all all Geo Data from api
-export async function getGeoData() {
+export async function getGeoData(input: string) {
   return await queryAPI("data-request", {
-    uid: getLoginCookie() || "",
+    input: input || "",
   });
 }
 
@@ -59,3 +59,4 @@ export async function clearUser(uid: string = getLoginCookie() || "") {
     uid: uid,
   });
 }
+

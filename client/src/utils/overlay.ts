@@ -1,21 +1,10 @@
 import { FeatureCollection } from "geojson";
 import { FillLayer } from "react-map-gl";
 
-import rl_data from "../geodata/fullDownload.json";
+// import rl_data from "../geodata/fullDownload.json";
+import { getGeoData } from "./api";
 
-const loadData = async () => {
-  const loadResp: Promise<String> = await fetch("http://localhost:3232/data-request")
-    .then((response) => response.json())
-    .catch(console.error);
-
-  if (loadResp != undefined) {
-    console.log(loadResp)
-    return loadResp;
-    }
-};
-
-
-const propertyName = "grade";
+const propertyName = "holc_grade";
 export const geoLayer: FillLayer = {
   id: "geo_data",
   type: "fill",
@@ -37,11 +26,15 @@ export const geoLayer: FillLayer = {
   },
 };
 
+let response : {result: string, data: FeatureCollection}
+let rl_data : any
+
 function isFeatureCollection(json: any): json is FeatureCollection {
   return json.type === "FeatureCollection";
 }
 
-export function overlayData(): GeoJSON.FeatureCollection | undefined {
-  const rl_data = loadData()
+export async function overlayData(input: string): Promise<GeoJSON.FeatureCollection | undefined> {
+  response = await getGeoData(input)
+  rl_data = response["data"]
   return isFeatureCollection(rl_data) ? rl_data : undefined;
 }

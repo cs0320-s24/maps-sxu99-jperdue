@@ -73,7 +73,7 @@ public class GeoHandler implements Route {
       Region region, double minLat, double maxLat, double minLong, double maxLong) {
     // Get the boundary of the region
 
-//    List<List<List<List<Double>>>> coords =
+    List<List<List<List<Double>>>> coords = region.coords().coordinates;
     return true;
 
 

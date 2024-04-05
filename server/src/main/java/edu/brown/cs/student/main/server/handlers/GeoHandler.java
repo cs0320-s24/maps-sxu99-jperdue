@@ -67,7 +67,7 @@ public class GeoHandler implements Route {
         // Convert back to GeoJSON
         // Return GeoJSON data
         return new GeoJsonSuccessResponse(data).serialize();
-      } catch (IOException e){
+      } catch (IOException e2){
         return new GeoJsonFailureResponse(e.getMessage()).serialize();
       }
     }
